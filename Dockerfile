@@ -15,4 +15,4 @@ COPY . .
 
 RUN bun prisma generate
 
-CMD [ "bun", "run", "src/index.ts" ]
+CMD [ "bun", "src/index.ts" ]
