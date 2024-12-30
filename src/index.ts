@@ -15,6 +15,8 @@ app.use(cors({
 app.notFound((c) => c.html(NotFoundTemplate));
 
 // ROUTES
+app.get("/", (c) => c.text('Welcome To TodoAPI'))
+
 import healthRouter from "./routes/healthCheck.routes";
 app.route('/api/v1', healthRouter);
 
