@@ -3,6 +3,7 @@ import { cors } from "hono/cors";
 
 import { connectDB } from "./db/index.db";
 import NotFoundTemplate from "./helpers/notFound.helper";
+import errorMessage from "./helpers/errorMessage.helper";
 
 const app = new Hono();
 
@@ -17,6 +18,9 @@ app.notFound((c) => c.html(NotFoundTemplate));
 import healthRouter from "./routes/healthCheck.routes";
 app.route('/api/v1', healthRouter);
 
+import userRoutes from "./routes/user.routes";
+app.route('/api/v1/users', userRoutes);
+
 connectDB()
   .then(() => {
     Bun.serve({
@@ -26,6 +30,5 @@ connectDB()
     console.log(`App Started On Port - ${Bun.env.PORT}`);
   })
   .catch((e: unknown) => {
-    const message = e instanceof Error ? e.message : "Database Connection Error.";
-    console.log(`Error - ${message}`);
+    console.log(`Error - ${errorMessage(e)}`);
   });
