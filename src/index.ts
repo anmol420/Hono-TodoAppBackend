@@ -8,7 +8,7 @@ import errorMessage from "./helpers/errorMessage.helper";
 const app = new Hono();
 
 app.use(cors({
-  origin: `${Bun.env.CORS_ORIGIN}`,
+  origin: `${process.env.CORS_ORIGIN}`,
   credentials: true,
 }));
 
@@ -25,9 +25,9 @@ connectDB()
   .then(() => {
     Bun.serve({
       fetch: app.fetch,
-      port: Bun.env.PORT 
+      port: process.env.PORT 
     });
-    console.log(`App Started On Port - ${Bun.env.PORT}`);
+    console.log(`App Started On Port - ${process.env.PORT}`);
   })
   .catch((e: unknown) => {
     console.log(`Error - ${errorMessage(e)}`);
