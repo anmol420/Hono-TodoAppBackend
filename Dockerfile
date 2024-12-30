@@ -8,4 +8,4 @@ RUN bun install
 
 COPY . .
 
-ENTRYPOINT [ "bun run", "src/index.ts" ]
+ENTRYPOINT [ "bun", "run", "src/index.ts" ]
