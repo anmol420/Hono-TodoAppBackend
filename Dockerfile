@@ -15,4 +15,4 @@ COPY . .
 
 RUN bun prisma generate
 
-CMD [ "bun", "src/index.ts" ]
+ENTRYPOINT [ "bun", "src/index.ts" ]
