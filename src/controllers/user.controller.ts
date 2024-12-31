@@ -30,8 +30,8 @@ const registerUser = async (c: Context) => {
     }
     try {
         const hashedPassword = await Bun.password.hash(newPassword, {
-            algorithm: "bcrypt",
-            cost: 13,
+            algorithm: "argon2id",
+            timeCost: 13,
         });
         const user = await prisma.user.create({
             data: {
