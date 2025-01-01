@@ -10,18 +10,8 @@ import { generateToken } from "../helpers/jwtToken";
 const prisma = getPrismaClient();
 
 const registerUser = async (c: Context) => {
-    const text = await c.req.text();
-    let body;
-    try {
-        body = JSON.parse(text);
-    } catch {
-        return c.json(
-            new ApiError(400, { message: "Invalid JSON." }),
-            400
-        );
-    }
-    const { username: newUsername, email: newEmail, password: newPassword } = body;
-    if (!newUsername || !newEmail || !newPassword) {
+    const { username, email, password } = c.get("validatedBody");
+    if (!username || !email || !password) {
         return c.json(
             new ApiError(404, { message: "Username, Email and Password Not Found." }),
             404
@@ -30,8 +20,8 @@ const registerUser = async (c: Context) => {
     const existedUser = await prisma.user.findFirst({
         where: {
             OR: [
-                { username: newUsername },
-                { email: newEmail }
+                { username },
+                { email }
             ]
         }
     });
@@ -41,14 +31,14 @@ const registerUser = async (c: Context) => {
         )
     }
     try {
-        const hashedPassword = await Bun.password.hash(newPassword, {
+        const hashedPassword = await Bun.password.hash(password, {
             algorithm: "argon2id",
             timeCost: 13,
         });
         const user = await prisma.user.create({
             data: {
-                username: newUsername,
-                email: newEmail,
+                username,
+                email,
                 password: hashedPassword,
             }
         });
@@ -65,18 +55,8 @@ const registerUser = async (c: Context) => {
 }
 
 const loginUser = async (c: Context) => {
-    const text = await c.req.text();
-    let body;
-    try {
-        body = JSON.parse(text);
-    } catch {
-        return c.json(
-            new ApiError(400, { message: "Invalid JSON." }),
-            400
-        );
-    }
-    const { email: userEmail, password: userPassword } = body;
-    if (!userEmail || !userPassword) {
+    const { email, password } = c.get("validatedBody");
+    if (!email || !password) {
         return c.json(
             new ApiError(404, { message: "Email and Password Not Found." }),
             404
@@ -84,7 +64,7 @@ const loginUser = async (c: Context) => {
     }
     const user = await prisma.user.findFirst({
         where: {
-            email: userEmail,
+            email,
         }
     });
     if (!user) {
@@ -93,7 +73,7 @@ const loginUser = async (c: Context) => {
             404
         );
     }
-    const isPasswordMatch = await Bun.password.verify(userPassword, user.password);
+    const isPasswordMatch = await Bun.password.verify(password, user.password);
     if (!isPasswordMatch) {
         return c.json(
             new ApiError(400, { message: "Invalid Password." }),
