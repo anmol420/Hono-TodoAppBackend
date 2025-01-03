@@ -18,4 +18,4 @@ RUN bun install
 # Generate Prisma Client
 RUN bunx prisma generate
 
-CMD [ "bun", "run", "start" ]
+CMD [ "bun", "run", "dev" ]
