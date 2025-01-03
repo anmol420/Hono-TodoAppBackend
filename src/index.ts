@@ -1,27 +1,7 @@
-import { Hono } from "hono";
-import { cors } from "hono/cors";
+import app from "./app";
 
 import { connectDB } from "./db/index.db";
-import NotFoundTemplate from "./helpers/notFound.helper";
 import errorMessage from "./helpers/errorMessage.helper";
-
-const app = new Hono();
-
-app.use(cors({
-  origin: `${process.env.CORS_ORIGIN}`,
-  credentials: true,
-}));
-
-app.notFound((c) => c.html(NotFoundTemplate));
-
-// ROUTES
-app.get("/", (c) => c.text('Welcome To TodoAPI'))
-
-import healthRouter from "./routes/healthCheck.routes";
-app.route('/api/v1', healthRouter);
-
-import userRoutes from "./routes/user.routes";
-app.route('/api/v1/users', userRoutes);
 
 connectDB()
   .then(() => {
