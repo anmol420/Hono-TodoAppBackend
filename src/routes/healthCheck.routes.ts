@@ -1,9 +1,10 @@
 import { Hono } from "hono";
 
-import { healthCheck } from "../controllers/healthCheck.controller";
+import HealthCheckController from "../controllers/healthCheck.controller";
 
 const healthRouter = new Hono();
+const healthCheckController = new HealthCheckController();
 
-healthRouter.get('/healthCheck', healthCheck);
+healthRouter.get('/healthCheck', healthCheckController.healthCheck);
 
 export default healthRouter;

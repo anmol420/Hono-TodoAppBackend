@@ -4,20 +4,20 @@ import ApiError from "../utils/ApiError";
 import ApiResponse from "../utils/ApiResponse";
 import errorMessage from "../helpers/errorMessage.helper";
 
-const healthCheck = async (c: Context) => {
-    try {
-        return c.json(
-            new ApiResponse(200, null, "API Running Good."),
-            200
-        );
-    } catch (error: unknown) {
-        return c.json(
-            new ApiError(500, errorMessage(error)),
-            500
-        )
+class HealthCheckController {
+    async healthCheck(c: Context) {
+        try {
+            return c.json(
+                new ApiResponse(200, null, "API Running Good."),
+                200
+            );
+        } catch (error: unknown) {
+            return c.json(
+                new ApiError(500, errorMessage(error)),
+                500
+            )
+        }
     }
-}
+} 
 
-export {
-    healthCheck,
-};
+export default HealthCheckController;
