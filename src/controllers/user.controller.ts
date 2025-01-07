@@ -5,7 +5,7 @@ import getPrismaClient from "../libs/prisma";
 import ApiError from "../utils/ApiError";
 import ApiResponse from "../utils/ApiResponse";
 import errorMessage from "../helpers/errorMessage.helper";
-import { generateToken } from "../helpers/jwtToken";
+import { generateToken } from "../helpers/jwtToken.helper";
 
 const prisma = getPrismaClient();
 
@@ -115,6 +115,55 @@ class UserController {
                 new ApiError(500, errorMessage(error)),
                 500
             );
+        }
+    }
+    async userProfile(c: Context) {
+        const user = c.get("user");
+        try {
+            return c.json(
+                new ApiResponse(200, user, "User Profile Retrieved Successfully."),
+                200
+            );
+        } catch (error: unknown) {
+            return c.json(
+                new ApiError(500, errorMessage(error)),
+                500
+            );
+            
+        }
+    }
+    async userDashboard(c: Context) {
+        const user = c.get("user");
+        try {
+            const userData = await prisma.user.findUnique({
+                where: {
+                    id: user.id,
+                },
+                include: {
+                    Todo: true,
+                }
+            });
+            const result = {
+                username: userData?.username,
+                email: userData?.email,
+                todos: userData?.Todo.map((todo) => {
+                    return {
+                        title: todo.title,
+                        description: todo.description,
+                        isCompleted: todo.isCompleted,
+                    };
+                }),
+            };
+            return c.json(
+                new ApiResponse(200, result, "User Dashboard Retrieved Successfully."),
+                200
+            );
+        } catch (error: unknown) {
+            return c.json(
+                new ApiError(500, errorMessage(error)),
+                500
+            );
+            
         }
     }
 }

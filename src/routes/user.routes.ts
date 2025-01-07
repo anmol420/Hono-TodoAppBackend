@@ -18,5 +18,7 @@ userRoutes.post("/login", zodValidator(loginSchema), userController.loginUser);
 
 // secure route
 userRoutes.post("/logout", authenticateUser, userController.logoutUser);
+userRoutes.get("/profile", authenticateUser, userController.userProfile);
+userRoutes.get("/dashboard", authenticateUser, userController.userDashboard);
 
 export default userRoutes;

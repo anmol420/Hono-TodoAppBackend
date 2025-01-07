@@ -3,7 +3,7 @@ import { getSignedCookie } from "hono/cookie";
 
 import ApiError from "../utils/ApiError";
 import getPrismaClient from "../libs/prisma";
-import { decodeToken } from "../helpers/jwtToken";
+import { decodeToken } from "../helpers/jwtToken.helper";
 import errorMessage from "../helpers/errorMessage.helper";
 
 const prisma = getPrismaClient();
