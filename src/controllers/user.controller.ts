@@ -163,7 +163,6 @@ class UserController {
                 new ApiError(500, errorMessage(error)),
                 500
             );
-            
         }
     }
 }
