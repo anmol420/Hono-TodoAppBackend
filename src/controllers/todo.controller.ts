@@ -50,6 +50,49 @@ class TodoController {
             );
         }
     }
+    async toggleTodoStatus(c: Context) {
+        const { title, isCompleted } = c.get("validatedBody");
+        if (!title || !isCompleted) { // TODO: BOOLEAN VALUE FIX
+            return c.json(
+                new ApiError(404, { message: "Title and isCompleted Not Found." }),
+                404
+            );
+        }
+        const user = c.get("user");
+        const todo = await prisma.todo.findFirst({
+            where: {
+                AND: [
+                    { title },
+                    { ownerId: user.id },
+                ],
+            },
+        });
+        if (!todo) {
+            return c.json(
+                new ApiError(404, { message: "Todo Not Found." }),
+                404
+            );
+        }
+        try {
+            const updatedTodo = await prisma.todo.update({
+                where: {
+                    id: todo.id,
+                },
+                data: {
+                    isCompleted,
+                },
+            });
+            return c.json(
+                new ApiResponse(200, updatedTodo, "Todo Status Updated Successfully."),
+                200
+            );
+        } catch (error: unknown) {
+            return c.json(
+                new ApiError(500, errorMessage(error)),
+                500
+            );
+        }
+    }
 }
 
 export default TodoController;
