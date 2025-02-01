@@ -52,12 +52,14 @@ class TodoController {
     }
     async toggleTodoStatus(c: Context) {
         const { title, isCompleted } = c.get("validatedBody");
-        if (!title || !isCompleted) { // TODO: BOOLEAN VALUE FIX
+        if (!title) { 
             return c.json(
-                new ApiError(404, { message: "Title and isCompleted Not Found." }),
+
+                new ApiError(404, { message: "Title Not Found." }),
                 404
             );
         }
+        const toggleStatus = isCompleted ? isCompleted : false;
         const user = c.get("user");
         const todo = await prisma.todo.findFirst({
             where: {
@@ -79,7 +81,7 @@ class TodoController {
                     id: todo.id,
                 },
                 data: {
-                    isCompleted,
+                    isCompleted: toggleStatus,
                 },
             });
             return c.json(
