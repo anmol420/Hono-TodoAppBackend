@@ -29,3 +29,4 @@ jobs:
         run: bun run prisma generate
       - name: Run migrations
         run: bun run prisma migrate deploy
+      - run: pm2 restart index
