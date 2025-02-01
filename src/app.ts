@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { cors } from "hono/cors";
+import { cors } from "hono/cors";   
 
 import NotFoundTemplate from "./helpers/notFound.helper";
 
