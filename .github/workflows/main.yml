@@ -22,10 +22,10 @@ jobs:
           bun-version: latest
       - name: Install dependencies
         run: bun install
+      - run: |
+          touch .env
+          echo "${{ secrets.PROD_ENV_FILE }}" > .env
       - name: Generate Prisma client
         run: bun run prisma generate
       - name: Run migrations
         run: bun run prisma migrate deploy
-      - run: |
-          touch .env
-          echo "${{ secrets.PROD_ENV_FILE }}" > .env
