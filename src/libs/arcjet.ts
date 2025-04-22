@@ -12,13 +12,14 @@ const aj = arcjet({
             allow: [
                 "CATEGORY:SEARCH_ENGINE",
                 "CATEGORY:MONITOR",
+                "POSTMAN",
             ],
         }),
         tokenBucket({
             mode: "LIVE",
             refillRate: 2, 
-            interval: 10,
-            capacity: 10,
+            interval: 5,
+            capacity: 2,
         }),
     ],
 });
