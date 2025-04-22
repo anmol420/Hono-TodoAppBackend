@@ -9,8 +9,14 @@ on:
       - main
 
 jobs:
+  check-runner:
+    runs-on: ubuntu-latest
+    steps:
+      - name: No self-hosted runner available
+        run: echo "Skipping build job. No self-hosted runner is configured."
+        
   build:
-    if: ${{ runner.os == 'Linux' }}
+    if: ${{ env.ENABLE_SELF_HOSTED_BUILD == 'true' }}
     runs-on: self-hosted
     steps:
       - name: Checkout repository
