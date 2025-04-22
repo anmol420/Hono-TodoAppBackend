@@ -7,25 +7,3 @@ on:
   pull_request:
     branches:
       - main
-
-jobs:
-  check-runner:
-    runs-on: ubuntu-latest
-    steps:
-      - name: No self-hosted runner available
-        run: echo "Skipping build job. No self-hosted runner is configured."
-        
-  build:
-    if: ${{ env.ENABLE_SELF_HOSTED_BUILD == 'true' }}
-    runs-on: self-hosted
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install unzip
-        run: sudo apt-get update && sudo apt-get install -y unzip
-
-      - name: Set up Bun
-        uses: oven-sh/setup-bun@v2.0.1
-        with:
-          bun-version: latest
