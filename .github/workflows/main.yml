@@ -10,12 +10,15 @@ on:
 
 jobs:
   build:
+    if: ${{ runner.os == 'Linux' }}
     runs-on: self-hosted
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
       - name: Install unzip
         run: sudo apt-get update && sudo apt-get install -y unzip
+
       - name: Set up Bun
         uses: oven-sh/setup-bun@v2.0.1
         with:
