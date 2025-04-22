@@ -7,3 +7,10 @@ on:
   pull_request:
     branches:
       - main
+
+jobs:
+  noop:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Skip - no jobs needed
+        run: echo "No CI/CD actions needed. Skipping..."
