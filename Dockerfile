@@ -12,6 +12,6 @@ RUN bun install
 
 RUN bunx prisma generate
 
-RUN bun run prisma migrate deploy
+RUN bun run prisma migrate dev
 
 CMD [ "bun", "run", "dev" ]
