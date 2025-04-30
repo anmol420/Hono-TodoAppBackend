@@ -5,14 +5,18 @@
     "start": "bun run src/index.ts"
   },
   "dependencies": {
-    "@arcjet/bun": "^1.0.0-alpha.34",
+    "@arcjet/bun": "^1.0.0-beta.6",
     "@prisma/client": "^6.6.0",
+    "amqplib": "^0.10.7",
     "hono": "^4.6.15",
+    "nodemailer": "^6.10.1",
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@types/amqplib": "^0.10.7",
     "@types/bun": "latest",
     "@types/node": "^22.10.2",
+    "@types/nodemailer": "^6.4.17",
     "prisma": "^6.6.0",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2"
