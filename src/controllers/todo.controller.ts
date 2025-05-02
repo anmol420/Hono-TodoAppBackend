@@ -1,6 +1,6 @@
-import { Context } from "hono";
+import {Context} from "hono";
 
-import getPrismaClient from "../libs/prisma";
+import getPrismaClient from "../libs/prisma.lib";
 import ApiError from "../utils/ApiError";
 import ApiResponse from "../utils/ApiResponse";
 import errorMessage from "../helpers/errorMessage.helper";
@@ -9,10 +9,10 @@ const prisma = getPrismaClient();
 
 class TodoController {
     async createTodo(c: Context) {
-        const { title, description } = c.get("validatedBody");
+        const {title, description} = c.get("validatedBody");
         if (!title || !description) {
             return c.json(
-                new ApiError(404, { message: "Title and Description Not Found." }),
+                new ApiError(404, {message: "Title and Description Not Found."}),
                 404
             );
         }
@@ -20,14 +20,14 @@ class TodoController {
         const todo = await prisma.todo.findFirst({
             where: {
                 AND: [
-                    { title },
-                    { ownerId: user.id },
+                    {title},
+                    {ownerId: user.id},
                 ],
             },
         });
         if (todo) {
             return c.json(
-                new ApiError(400, { message: "Todo With Same Title Already Exists." }),
+                new ApiError(400, {message: "Todo With Same Title Already Exists."}),
                 400
             );
         }
@@ -50,12 +50,12 @@ class TodoController {
             );
         }
     }
-    async toggleTodoStatus(c: Context) {
-        const { title, isCompleted } = c.get("validatedBody");
-        if (!title) { 
-            return c.json(
 
-                new ApiError(404, { message: "Title Not Found." }),
+    async toggleTodoStatus(c: Context) {
+        const {title, isCompleted} = c.get("validatedBody");
+        if (!title) {
+            return c.json(
+                new ApiError(404, {message: "Title Not Found."}),
                 404
             );
         }
@@ -64,14 +64,14 @@ class TodoController {
         const todo = await prisma.todo.findFirst({
             where: {
                 AND: [
-                    { title },
-                    { ownerId: user.id },
+                    {title},
+                    {ownerId: user.id},
                 ],
             },
         });
         if (!todo) {
             return c.json(
-                new ApiError(404, { message: "Todo Not Found." }),
+                new ApiError(404, {message: "Todo Not Found."}),
                 404
             );
         }
