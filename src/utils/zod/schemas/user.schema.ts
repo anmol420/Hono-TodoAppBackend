@@ -14,12 +14,42 @@ const registerSchema = z.object({
     password: passwordSchema,
 });
 
+const verifyRegistrationOTPSchema = z.object({
+    email: z.string().email("Invalid Email."),
+    otp: z.string(),
+});
+
 const loginSchema = z.object({
     email: z.string().email("Invalid Email."),
     password: passwordSchema,
 });
 
+const forgotPasswordSchema = z.object({
+    email: z.string().email("Invalid Email."),
+});
+
+const verifyForgotPasswordOTPSchema = z.object({
+    email: z.string().email("Invalid Email."),
+    otp: z.string(),
+});
+
+const changeForgotPasswordSchema = z.object({
+    email: z.string().email("Invalid Email."),
+    password: passwordSchema,
+});
+
+const changePasswordSchema = z.object({
+    email: z.string().email("Invalid Email."),
+    oldPassword: z.string(),
+    newPassword: passwordSchema,
+});
+
 export {
     registerSchema,
+    verifyRegistrationOTPSchema,
     loginSchema,
+    forgotPasswordSchema,
+    verifyForgotPasswordOTPSchema,
+    changeForgotPasswordSchema,
+    changePasswordSchema,
 };
