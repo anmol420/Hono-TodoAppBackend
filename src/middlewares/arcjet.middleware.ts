@@ -2,7 +2,7 @@ import { Context } from "hono";
 
 import ApiError from "../utils/ApiError";
 import errorMessage from "../helpers/errorMessage.helper";
-import aj from "../libs/arcjet";
+import aj from "../libs/arcjet.lib";
 
 const arcjetMiddleware = async (c: Context, next: Function) => {
     try {
