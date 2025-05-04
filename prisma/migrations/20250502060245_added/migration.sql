@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "User" ALTER COLUMN "verificationOTP" DROP NOT NULL,
+ALTER COLUMN "verificationOTP" DROP DEFAULT;

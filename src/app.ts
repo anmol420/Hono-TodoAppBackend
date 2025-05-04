@@ -1,14 +1,8 @@
 import { Hono } from "hono";
-import { cors } from "hono/cors";   
 
 import NotFoundTemplate from "./helpers/notFound.helper";
 
 const app = new Hono();
-
-// app.use(cors({
-//     origin: `${process.env.CORS_ORIGIN}`,
-//     credentials: true,
-// }));
 
 app.notFound((c) => c.html(NotFoundTemplate));
 
