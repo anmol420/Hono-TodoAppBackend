@@ -10,6 +10,4 @@ COPY . .
 
 RUN bun install
 
-RUN bunx prisma generate
-
-CMD ["sh", "-c", "bunx prisma generate && bunx prisma migrate deploy && bun run dev"]
+CMD ["sh", "./start.sh"]
