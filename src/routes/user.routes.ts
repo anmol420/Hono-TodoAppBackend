@@ -33,6 +33,5 @@ userRoutes.post("/changeForgotPassword", zodValidator(changeForgotPasswordSchema
 userRoutes.post("/logout", authenticateUser, userController.logoutUser);
 userRoutes.patch("/changePassword", authenticateUser, zodValidator(changePasswordSchema), userController.changePassword);
 userRoutes.get("/profile", authenticateUser, userController.userProfile);
-userRoutes.get("/dashboard", authenticateUser, userController.userDashboard);
 
 export default userRoutes;

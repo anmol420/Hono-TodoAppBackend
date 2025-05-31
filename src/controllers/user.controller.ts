@@ -1,15 +1,13 @@
 import {Context} from "hono";
 import {deleteCookie, setSignedCookie} from "hono/cookie";
 
-import getPrismaClient from "../libs/prisma.lib";
+import User from "../models/user.model";
 import ApiError from "../utils/ApiError";
 import ApiResponse from "../utils/ApiResponse";
 import errorMessage from "../helpers/errorMessage.helper";
 import {generateToken} from "../helpers/jwtToken.helper";
 import userProducer from "../utils/mq/producer/user.producer";
 import generateOTP from "../helpers/otpGenerator.helper";
-
-const prisma = getPrismaClient();
 
 class UserController {
     async registerUser(c: Context) {
@@ -20,17 +18,21 @@ class UserController {
                 404
             );
         }
-        const existedUser = await prisma.user.findFirst({
-            where: {
-                OR: [
-                    {email}
-                ]
-            }
+        const usernameExists = await User.findOne({
+            username,
         });
-        if (existedUser) {
+        if (usernameExists) {
             return c.json(
-                new ApiError(400, {message: "User Already Exists."})
-            )
+                new ApiError(404, {message: "Username already exists"}),
+            );
+        }
+        const emailExists = await User.findOne({
+            email,
+        });
+        if (emailExists) {
+            return c.json(
+                new ApiError(404, {message: "Email already exists"}),
+            );
         }
         try {
             const hashedPassword = await Bun.password.hash(password, {
@@ -38,14 +40,12 @@ class UserController {
                 cost: 10,
             });
             const otp = generateOTP();
-            const user = await prisma.user.create({
-                data: {
-                    username,
-                    email,
-                    password: hashedPassword,
-                    verificationOTP: otp,
-                }
-            });
+            const user = await User.create({
+                username,
+                email,
+                password: hashedPassword,
+                verificationOTP: otp,
+            })
             await userProducer<{ email: string, otp: string }>("user.register.registrationOTP", {
                 email: email,
                 otp: otp
@@ -70,10 +70,8 @@ class UserController {
                 404
             );
         }
-        const user = await prisma.user.findFirst({
-            where: {
-                email,
-            },
+        const user = await User.findOne({
+            email,
         });
         if (!user) {
             return c.json(
@@ -88,14 +86,16 @@ class UserController {
             );
         }
         try {
-            await prisma.user.update({
-                where: {
+            await User.findOneAndUpdate(
+                {
                     email,
                 },
-                data: {
-                    isVerified: true,
-                }
-            });
+                {
+                    $set: {
+                        isVerified: true,
+                    }
+                },
+            );
             await userProducer<{ email: string }>("user.register.welcomeMessage", {email: email});
             return c.json(
                 new ApiResponse(200, null, "User Registered Successfully."),
@@ -117,11 +117,9 @@ class UserController {
                 404
             );
         }
-        const user = await prisma.user.findFirst({
-            where: {
-                email,
-            }
-        });
+        const user = await User.findOne({
+            email,
+        })
         if (!user) {
             return c.json(
                 new ApiError(404, {message: "User Not Found."}),
@@ -142,7 +140,7 @@ class UserController {
             );
         }
         try {
-            const token = await generateToken({userid: user.id});
+            const token = await generateToken({userid: user._id});
             await setSignedCookie(
                 c,
                 "token",
@@ -196,40 +194,6 @@ class UserController {
         }
     }
 
-    async userDashboard(c: Context) {
-        const user = c.get("user");
-        try {
-            const userData = await prisma.user.findUnique({
-                where: {
-                    id: user.id,
-                },
-                include: {
-                    Todo: true,
-                }
-            });
-            const result = {
-                username: userData?.username,
-                email: userData?.email,
-                todos: userData?.Todo.map((todo) => {
-                    return {
-                        title: todo.title,
-                        description: todo.description,
-                        isCompleted: todo.isCompleted,
-                    };
-                }),
-            };
-            return c.json(
-                new ApiResponse(200, result, "User Dashboard Retrieved Successfully."),
-                200
-            );
-        } catch (error: unknown) {
-            return c.json(
-                new ApiError(500, errorMessage(error)),
-                500
-            );
-        }
-    }
-
     async forgotPassword(c: Context) {
         const {email} = c.get("validatedBody");
         if (!email) {
@@ -238,10 +202,8 @@ class UserController {
                 404
             );
         }
-        const user = await prisma.user.findFirst({
-            where: {
-                email,
-            }
+        const user = await User.findOne({
+            email,
         });
         if (!user) {
             return c.json(
@@ -251,14 +213,16 @@ class UserController {
         }
         try {
             const otp = generateOTP();
-            await prisma.user.update({
-                where: {
+            await User.findOneAndUpdate(
+                {
                     email,
                 },
-                data: {
-                    verificationOTP: otp,
+                {
+                    $set: {
+                        verificationOTP: otp,
+                    }
                 }
-            });
+            );
             await userProducer<{email: string, otp: string}>("user.password.forgotPasswordOTP", {email: email, otp: otp});
             return c.json(
                 new ApiResponse(200, null, "OTP Send Successfully."),
@@ -280,10 +244,8 @@ class UserController {
                 404
             );
         }
-        const user = await prisma.user.findFirst({
-            where: {
-                email,
-            }
+        const user = await User.findOne({
+            email,
         });
         if (!user) {
             return c.json(
@@ -318,10 +280,8 @@ class UserController {
                 404
             );
         }
-        const user = await prisma.user.findFirst({
-            where: {
-                email,
-            }
+        const user = await User.findOne({
+            email,
         });
         if (!user) {
             return c.json(
@@ -329,19 +289,28 @@ class UserController {
                 404
             );
         }
+        const comparedPassword = await Bun.password.verify(password, user.password);
+        if (comparedPassword) {
+            return c.json(
+                new ApiError(400, {message: "Old and New Password Are Same."}),
+                400
+            );
+        }
         try {
             const hashedPassword = await Bun.password.hash(password, {
                 algorithm: "bcrypt",
                 cost: 10,
             });
-            await prisma.user.update({
-                where: {
+            await User.findOneAndUpdate(
+                {
                     email,
                 },
-                data: {
-                    password: hashedPassword,
+                {
+                    $set: {
+                        password: hashedPassword,
+                    }
                 }
-            });
+            )
             await userProducer<{email: string}>("user.password.changePassword", {email: email});
             return c.json(
                 new ApiResponse(200, null, "Password Changed Successfully."),
@@ -363,10 +332,14 @@ class UserController {
                 404
             );
         }
-        const user = await prisma.user.findFirst({
-            where: {
-                email,
-            }
+        if (oldPassword === newPassword) {
+            return c.json(
+                new ApiError(400, {message: "Old And New Password Can't Be Same."}),
+                400
+            );
+        }
+        const user = await User.findOne({
+            email,
         });
         if (!user) {
             return c.json(
@@ -386,14 +359,16 @@ class UserController {
                 algorithm: "bcrypt",
                 cost: 10,
             });
-            await prisma.user.update({
-                where: {
-                    email
+            await User.findOneAndUpdate(
+                {
+                    email,
                 },
-                data: {
-                    password: hashedPassword,
+                {
+                    $set: {
+                        password: hashedPassword,
+                    }
                 }
-            });
+            )
             await userProducer<{email: string}>("user.password.changePassword", {email: email});
             return c.json(
                 new ApiResponse(200, null, "Password Changed Successfully."),

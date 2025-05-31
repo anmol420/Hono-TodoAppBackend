@@ -1,15 +1,13 @@
-import getPrismaClient from "../libs/prisma.lib";
+import * as mongoose from "mongoose";
 
 import errorMessage from "../helpers/errorMessage.helper";
 
-const prisma = getPrismaClient();
-
 const connectDB = async () => {
     try {
-        await prisma.$connect();
-        console.log("Prisma Connected.");
+        const db = await mongoose.connect(process.env.DATABASE_URL as string);
+        console.log("MongoDB Connected: ", db.connection.host);
     } catch (error) {
-        console.log(`Error In Connecting To Prisma - ${errorMessage(error)}`);
+        console.log(`Error In Connecting To MongoDB - ${errorMessage(error)}`);
         process.exit(1);
     }
 };

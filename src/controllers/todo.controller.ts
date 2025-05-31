@@ -1,11 +1,9 @@
 import {Context} from "hono";
 
-import getPrismaClient from "../libs/prisma.lib";
+import Todo from "../models/todo.model";
 import ApiError from "../utils/ApiError";
 import ApiResponse from "../utils/ApiResponse";
 import errorMessage from "../helpers/errorMessage.helper";
-
-const prisma = getPrismaClient();
 
 class TodoController {
     async createTodo(c: Context) {
@@ -17,13 +15,9 @@ class TodoController {
             );
         }
         const user = c.get("user");
-        const todo = await prisma.todo.findFirst({
-            where: {
-                AND: [
-                    {title},
-                    {ownerId: user.id},
-                ],
-            },
+        const todo = await Todo.findOne({
+            title,
+            ownerId: user._id,
         });
         if (todo) {
             return c.json(
@@ -32,12 +26,10 @@ class TodoController {
             );
         }
         try {
-            const newTodo = await prisma.todo.create({
-                data: {
-                    title,
-                    description,
-                    ownerId: user.id,
-                },
+            const newTodo = await Todo.create({
+                title,
+                description,
+                ownerId: user._id,
             });
             return c.json(
                 new ApiResponse(200, newTodo, "Todo Created Successfully."),
@@ -61,13 +53,9 @@ class TodoController {
         }
         const toggleStatus = isCompleted ? isCompleted : false;
         const user = c.get("user");
-        const todo = await prisma.todo.findFirst({
-            where: {
-                AND: [
-                    {title},
-                    {ownerId: user.id},
-                ],
-            },
+        const todo = await Todo.findOne({
+            title,
+            ownerId: user._id,
         });
         if (!todo) {
             return c.json(
@@ -76,14 +64,17 @@ class TodoController {
             );
         }
         try {
-            const updatedTodo = await prisma.todo.update({
-                where: {
-                    id: todo.id,
+            const updatedTodo = await Todo.findByIdAndUpdate(
+                todo._id,
+                {
+                    $set: {
+                        isCompleted: toggleStatus,
+                    }
                 },
-                data: {
-                    isCompleted: toggleStatus,
-                },
-            });
+                {
+                    new: true,
+                }
+            );
             return c.json(
                 new ApiResponse(200, updatedTodo, "Todo Status Updated Successfully."),
                 200
