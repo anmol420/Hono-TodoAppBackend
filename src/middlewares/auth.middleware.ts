@@ -2,11 +2,9 @@ import { Context } from "hono";
 import { getSignedCookie } from "hono/cookie";
 
 import ApiError from "../utils/ApiError";
-import getPrismaClient from "../libs/prisma.lib";
+import User from "../models/user.model";
 import { decodeToken } from "../helpers/jwtToken.helper";
 import errorMessage from "../helpers/errorMessage.helper";
-
-const prisma = getPrismaClient();
 
 const authenticateUser = async (c: Context, next: Function) => {
     const token = await getSignedCookie(c, process.env.COOKIE_SIGNATURE as string, "token");
@@ -23,10 +21,8 @@ const authenticateUser = async (c: Context, next: Function) => {
             401
         );
     }
-    const user = await prisma.user.findUnique({
-        where: {
-            id: decodedToken.payload.userid as string,
-        }
+    const user = await User.findById({
+        _id: decodedToken.payload.userid,
     });
     if (!user) {
         return c.json(
