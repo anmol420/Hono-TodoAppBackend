@@ -11,6 +11,9 @@ import {
 import {
     createTodoSchema,
     toggleTodoStatusSchema,
+    updateTodoSchema,
+    findTodoByIdSchema,
+    deleteTodoSchema,
 } from "./schemas/todo.schema"
 
 export {
@@ -23,4 +26,7 @@ export {
     changePasswordSchema,
     createTodoSchema,
     toggleTodoStatusSchema,
+    updateTodoSchema,
+    findTodoByIdSchema,
+    deleteTodoSchema,
 };

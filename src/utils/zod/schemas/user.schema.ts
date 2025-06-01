@@ -39,7 +39,6 @@ const changeForgotPasswordSchema = z.object({
 });
 
 const changePasswordSchema = z.object({
-    email: z.string().email("Invalid Email."),
     oldPassword: z.string(),
     newPassword: passwordSchema,
 });
