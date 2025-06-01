@@ -325,8 +325,8 @@ class UserController {
     }
 
     async changePassword(c: Context) {
-        const {email, oldPassword, newPassword} = c.get("validatedBody");
-        if (!email || !newPassword || !oldPassword) {
+        const {oldPassword, newPassword} = c.get("validatedBody");
+        if (!newPassword || !oldPassword) {
             return c.json(
                 new ApiError(404, {message: "Email And Old and New Password Not Found."}),
                 404
@@ -338,6 +338,8 @@ class UserController {
                 400
             );
         }
+        const fetchUser = c.get("user");
+        const email = fetchUser.email;
         const user = await User.findOne({
             email,
         });
