@@ -7,8 +7,7 @@ const createTodoSchema = z.object({
         .max(50, "Title Must Be Less Than 50 Characters"),
     description: z
         .string()
-        .min(5, "Description Must Be At Least 5 Characters Long.")
-        .max(255, "Description Must Be Less Than 255 Characters"),
+        .optional(),
 });
 
 const toggleTodoStatusSchema = z.object({
